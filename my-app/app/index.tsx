@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import {Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform} from 'react-native';
 import LoadingScreen from './LoadingScreen';
-import { Image } from 'react-native';
 
 
 const App: React.FC = () => {
@@ -10,6 +8,55 @@ const App: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const[firstName, setFirstName] = useState('');
+  const[lastName, setLastName] = useState('');
+  const[phoneNum, setPhoneNum] = useState('');
+  const[birthDate, setBirthDate] = useState('');
+  const[confirmPasword, setConfirmPasword] = useState('');
+
+
+  
+  const handleRegister = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await response.json();
+      if (response.status === 201) {
+        Alert.alert('Success', data.message);
+      } else {
+        Alert.alert('Error', data.error);
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Unable to register user');
+    }
+  };
+
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await response.json();
+      if (response.status === 200) {
+        Alert.alert('Success', data.message);
+      } else {
+        Alert.alert('Error', data.error);
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Unable to login user');
+    }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -21,17 +68,8 @@ const App: React.FC = () => {
 
   const handleToggle = () => {
     setIsSignUp(!isSignUp);
-    setEmail(''); // Reset email when toggling between sign up and login
-    setPassword(''); // Reset password when toggling between sign up and login
-  };
-
-  const handleSubmit = () => {
-    if (isSignUp) {
-      console.log('Sign-Up:', { email, password });
-    } else {
-      console.log('Log-In:', { email, password });
-    }
-    alert(`${isSignUp ? 'Signed Up' : 'Logged In'} successfully!`);
+    setEmail('');
+    setPassword('');
   };
 
   // Always ensure that this hook is called before the conditional rendering
@@ -40,14 +78,44 @@ const App: React.FC = () => {
   }
 
   return (
-    <LinearGradient
-      colors={['#FF939B', '#F65864', '#EF2A39']} // Gradient background
-      style={styles.gradientContainer}
-    > <Image source={require('../assets/images/Logo.png')} style={styles.logo} />
-      <View style={styles.container}>
-        
+    <KeyboardAvoidingView style={styles.background} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}> 
         <Text style={styles.title}>{isSignUp ? 'Sign Up' : 'Log In'}</Text>
 
+        {isSignUp && (
+          <TextInput
+            style={styles.input}
+            placeholder="First Name"
+            placeholderTextColor="#aaa"
+            value={firstName}
+            onChangeText={setFirstName}
+            keyboardType="default"
+            autoCapitalize="none"
+          />
+        )}
+
+        {isSignUp && (
+          <TextInput
+            style={styles.input}
+            placeholder="Last Name"
+            placeholderTextColor="#aaa"
+            value={lastName}
+            onChangeText={setLastName}
+            keyboardType="default"
+            autoCapitalize="none"
+          />
+        )}
+
+        {isSignUp && (
+          <TextInput
+            style={styles.input}
+            placeholder="Phone Number"
+            placeholderTextColor="#aaa"
+            value={phoneNum}
+            onChangeText={setPhoneNum}
+            keyboardType="numeric"
+          />
+        )}
+      
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -67,57 +135,75 @@ const App: React.FC = () => {
           secureTextEntry
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>{isSignUp ? 'Sign Up' : 'Log In'}</Text>
+        {isSignUp && (
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm Pasword"
+            placeholderTextColor="#aaa"
+            value={confirmPasword}
+            onChangeText={setConfirmPasword}
+            secureTextEntry
+          />
+        )}
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={isSignUp ? handleRegister : handleLogin}
+        >
+        <Text style={styles.buttonText}>{isSignUp ? 'Sign Up' : 'Log In'}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={handleToggle}>
-          <Text style={styles.toggleText}>
-            {isSignUp ? 'Already have an account? Log In' : 'Don’t have an account? Sign Up'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </LinearGradient>
+            <Text style={styles.toggleText}>
+              {isSignUp ? 'Already have an account? Log In' : 'Don’t have an account? Sign Up'}
+            </Text>
+          </TouchableOpacity>
+          
+
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  gradientContainer: {
+  background: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
+    backgroundColor: '#FFFFFF',
   },
   container: {
+    flex: 1,
     width: '100%',
     maxWidth: 400,
-    justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 40,
+
   },
   title: {
-    fontSize: 28,
+    fontSize: 37,
     fontWeight: '700',
-    color: '#FFF',
+    color: '#EF2A39',
     marginBottom: 40,
     letterSpacing: 2,
+    marginRight: 220
   },
   input: {
     width: '100%',
     height: 50,
-    borderColor: '#fff',
-    borderWidth: 2,
-    borderRadius: 25,
+    borderColor: 'black',
+    borderWidth: 0.5,
+    borderRadius: 15,
     paddingHorizontal: 20,
     marginBottom: 20,
     backgroundColor: '#fff',
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#FFC42E',
+    backgroundColor: '#EF2A39',
     width: '100%',
     paddingVertical: 15,
-    borderRadius: 25,
+    borderRadius: 15,
     alignItems: 'center',
     marginBottom: 20,
     elevation: 3,
@@ -134,9 +220,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
 
-  logo: {
-    marginBottom: -150
-  }
+
 });
 
 export default App;
