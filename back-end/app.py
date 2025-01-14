@@ -21,6 +21,10 @@ class User(db.Model):
 with app.app_context():
     db.create_all()
 
+@app.route('/')
+def hello():
+    return jsonify({"message": "Hello, World!"})
+
 # User registration route (POST)
 @app.route('/register', methods=['POST'])
 def register():

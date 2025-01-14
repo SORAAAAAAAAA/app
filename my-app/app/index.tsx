@@ -18,9 +18,9 @@ const App: React.FC = () => {
   
   const handleRegister = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/register', {
+      const response = await fetch('http://192.168.5.94:5000/register', {
         method: 'POST',
-        headers: {
+        headers: { 
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
@@ -39,7 +39,7 @@ const App: React.FC = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/login', {
+      const response = await fetch('http://192.168.5.94:5000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
