@@ -1,63 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import {Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform} from 'react-native';
-import LoadingScreen from './LoadingScreen';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { View, Text, StyleSheet } from 'react-native';
+import LoadingScreen from './components/LoadingScreen';
+import LogSign from './components/LogSign';
+import MainPage from './components/MainPage';
+import Search from './components/Search';
+import Orders from './components/Orders';
+import Profile from './components/Profile';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+//import ProfilePage from './components/ProfilePage';
+//import SettingsPage from './components/SettingsPage';
 
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+const CustomHeader: React.FC<{ title: string }> = ({ title }) => (
+  <View style={styles.headerContainer}>
+    <View style={styles.loc}>
+      <Icon name="location" size={25} color="#D42323" />
+    </View>
+    <View>
+      <Text style={styles.headerTitle}>DELIVER TO</Text>
+      <Text style={styles.headLoc}>Dasmarinas Cavite, City</Text>
+    </View>
+    <View style={styles.headIC}>
+      <Icon name="chevron-down-outline" size={25} color="#000000" style={styles.headerIcons}/>
+      <Icon name="notifications-outline" size={25} color="#E95322" style={styles.headerIcons}/>
+      <Icon name="bag-outline" size={25} color="#E95322" style={styles.headerIcons}/>
+    </View>
+    
+  </View>
+);
 
 const App: React.FC = () => {
   const [isAppReady, setIsAppReady] = useState<boolean>(false);
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const[firstName, setFirstName] = useState('');
-  const[lastName, setLastName] = useState('');
-  const[phoneNum, setPhoneNum] = useState('');
-  const[birthDate, setBirthDate] = useState('');
-  const[confirmPasword, setConfirmPasword] = useState('');
-
-
+  const [isLogged, setIsLogged] = useState<boolean>(false);
   
-  const handleRegister = async () => {
-    try {
-      const response = await fetch('http://192.168.5.94:5000/register', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await response.json();
-      if (response.status === 201) {
-        Alert.alert('Success', data.message);
-      } else {
-        Alert.alert('Error', data.error);
-      }
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'Unable to register user');
-    }
-  };
-
-  const handleLogin = async () => {
-    try {
-      const response = await fetch('http://192.168.5.94:5000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await response.json();
-      if (response.status === 200) {
-        Alert.alert('Success', data.message);
-      } else {
-        Alert.alert('Error', data.error);
-      }
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'Unable to login user');
-    }
-  };
-
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsAppReady(true); // After 3 seconds, show the main content
@@ -66,161 +46,95 @@ const App: React.FC = () => {
     return () => clearTimeout(timer); // Clean up the timer on unmount
   }, []); // This runs only once after the component mounts
 
-  const handleToggle = () => {
-    setIsSignUp(!isSignUp);
-    setEmail('');
-    setPassword('');
-  };
-
-  // Always ensure that this hook is called before the conditional rendering
   if (!isAppReady) {
     return <LoadingScreen />; // Show LoadingScreen while the app is initializing
   }
+  
+  const MainTabs = () => (
+    <Tab.Navigator 
+    screenOptions={{
+      headerShown: false,
+      tabBarStyle: {
+        borderTopWidth: 0,
+        elevation: 0,
+        shadowOpacity: 0,
+        height: 54
+      }}}>
+      <Tab.Screen 
+      name="Home" 
+      component={MainPage}
+      options={{
+        tabBarIcon: ({color, size }) => <Icon name="home" color={'#D42323'} size={size} />,
+      }}  />
+      <Tab.Screen 
+      name="Search" 
+      component={Search} 
+      options={{
+        tabBarIcon: ({ color, size }) => <Icon name="search-outline" color={color} size={size} />,
+      }}/>
+      <Tab.Screen 
+      name="Orders" 
+      component={Orders} 
+      options={{
+        tabBarIcon: ({ color, size }) => <Icon name="document-text-outline" color={color} size={size} />,
+      }}/>
+      <Tab.Screen 
+      name="Profiles" 
+      component={Profile} 
+      options={{
+        tabBarIcon: ({ color, size }) => <Icon name="person-outline" color={color} size={size} />,
+      }}/>
+    </Tab.Navigator>
+  );
 
   return (
-    <KeyboardAvoidingView style={styles.background} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}> 
-        <Text style={styles.title}>{isSignUp ? 'Sign Up' : 'Log In'}</Text>
-
-        {isSignUp && (
-          <TextInput
-            style={styles.input}
-            placeholder="First Name"
-            placeholderTextColor="#aaa"
-            value={firstName}
-            onChangeText={setFirstName}
-            keyboardType="default"
-            autoCapitalize="none"
-          />
+      <Stack.Navigator>
+        {isLogged ? (
+          <Stack.Screen 
+          name="Main" 
+          component={MainTabs} 
+          options={{
+            header: () => <CustomHeader title="Main Page" />,
+          }} />
+        ) : (
+          <Stack.Screen 
+          name="Home" options={{headerShown: false}}>
+            {props => <LogSign {...props} setIsLogged={setIsLogged} />}
+          </Stack.Screen>
         )}
-
-        {isSignUp && (
-          <TextInput
-            style={styles.input}
-            placeholder="Last Name"
-            placeholderTextColor="#aaa"
-            value={lastName}
-            onChangeText={setLastName}
-            keyboardType="default"
-            autoCapitalize="none"
-          />
-        )}
-
-        {isSignUp && (
-          <TextInput
-            style={styles.input}
-            placeholder="Phone Number"
-            placeholderTextColor="#aaa"
-            value={phoneNum}
-            onChangeText={setPhoneNum}
-            keyboardType="numeric"
-          />
-        )}
-      
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#aaa"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor="#aaa"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-
-        {isSignUp && (
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm Pasword"
-            placeholderTextColor="#aaa"
-            value={confirmPasword}
-            onChangeText={setConfirmPasword}
-            secureTextEntry
-          />
-        )}
-
-        <TouchableOpacity
-          style={styles.button}
-          onPress={isSignUp ? handleRegister : handleLogin}
-        >
-        <Text style={styles.buttonText}>{isSignUp ? 'Sign Up' : 'Log In'}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={handleToggle}>
-            <Text style={styles.toggleText}>
-              {isSignUp ? 'Already have an account? Log In' : 'Don’t have an account? Sign Up'}
-            </Text>
-          </TouchableOpacity>
-          
-
-    </KeyboardAvoidingView>
+      </Stack.Navigator>
   );
 };
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    justifyContent: 'center',
+  headerContainer: {
+    flexDirection: 'row',
+    height: 60,
+    backgroundColor: '#ffffff',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    backgroundColor: '#FFFFFF',
   },
-  container: {
-    flex: 1,
-    width: '100%',
-    maxWidth: 400,
-    alignItems: 'center',
-    paddingVertical: 40,
-
-  },
-  title: {
-    fontSize: 37,
-    fontWeight: '700',
-    color: '#EF2A39',
-    marginBottom: 40,
-    letterSpacing: 2,
-    marginRight: 220
-  },
-  input: {
-    width: '100%',
-    height: 50,
-    borderColor: 'black',
-    borderWidth: 0.5,
-    borderRadius: 15,
-    paddingHorizontal: 20,
-    marginBottom: 20,
-    backgroundColor: '#fff',
-    fontSize: 16,
-  },
-  button: {
-    backgroundColor: '#EF2A39',
-    width: '100%',
-    paddingVertical: 15,
-    borderRadius: 15,
-    alignItems: 'center',
-    marginBottom: 20,
-    elevation: 3,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
+  headerTitle: {
+    color: '#E95322',
+    fontSize: 20,
     fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
   },
-  toggleText: {
-    color: '#FFC42E',
-    fontSize: 16,
-    marginTop: 10,
-    textDecorationLine: 'underline',
+  headLoc:{
+    fontFamily: 'Poppins-Regular',
+    },
+  headIC:{
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
-
-
+  loc:{
+    marginLeft: 10,
+  },
+  headerIcons: {
+    padding: 10,
+    marginRight: 10
+  }
 });
 
 export default App;
+

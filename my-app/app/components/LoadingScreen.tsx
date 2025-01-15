@@ -3,12 +3,16 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFonts } from 'expo-font';
 
+
+
+
+
 const LoadingScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Always call the font loading hook at the top level, not inside any conditionals
   const [fontsLoaded] = useFonts({
-    'Poppins-SemiBold': require('../assets/fonts/Poppins-SemiBold.ttf'),
+    'Poppins-SemiBold': require('../../assets/fonts/Poppins-SemiBold.ttf'),
   });
 
   useEffect(() => {
@@ -39,7 +43,7 @@ const LoadingScreen: React.FC = () => {
       <View style={styles.container}>
         {isLoading ? (
           <>
-            <Image source={require('../assets/images/Logo.png')} style={styles.logo} />
+            <Image source={require('../../assets/images/Logo.png')} style={styles.logo} />
             <Text style={styles.text}>GRABEAT</Text>
           </>
         ) : (
