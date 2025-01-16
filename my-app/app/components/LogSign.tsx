@@ -23,7 +23,7 @@ interface LogSignProps {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ email, password, firstName, lastName, phoneNum, confirmPassword }),
         });
         const data = await response.json();
         if (response.status === 201) {
