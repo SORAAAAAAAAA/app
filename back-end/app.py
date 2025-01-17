@@ -62,8 +62,25 @@ class UserService(BaseService):
         new_user = User(email=email, password=hashed_password, firstName=firstName, lastName=lastName, phoneNum=phoneNum)
         db.session.add(new_user)
         db.session.commit()
-
+            
         return {"message": "User registered successfully"}, 201
+    
+    def login_user(self, data):
+        email = data.get('email')
+        password = data.get('password')
+
+        user = User.query.filter_by(email=email).first()
+
+        if not self.validate_email(email):
+            return {"error": "Invalid email address!"}, 400
+        
+        if not user:
+            return {"error": "User does not exist!"}, 400
+
+        if not bcrypt.check_password_hash(user.password, password):
+            return {"error": "Wrong password!"}, 400
+
+        return {"message": "User logged in successfully"}, 200
 
 class LogSign:
     def __init__(self):
@@ -81,8 +98,18 @@ class LogSign:
         user_service = UserService()
         response, status = user_service.register_user(data)
         return jsonify(response), status
+    
+    @staticmethod
+    @app.route('/login', methods=['POST'])
+    def login():
+        data = request.get_json()
+        user_service = UserService()
+        response, status = user_service.login_user(data)
+        return jsonify(response), status
+        
+        
 
 log_sign = LogSign()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)  # Listen on all available IP addresses
