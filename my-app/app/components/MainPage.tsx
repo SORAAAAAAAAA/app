@@ -33,17 +33,21 @@ const MainPage = () => {
             <View style={styles.movContainer}>
                 <ScrollView horizontal={true} style={styles.scrollContainer} showsHorizontalScrollIndicator={false} pagingEnabled={false}>
                 <View>
-                    <Image style={styles.imgM} source={require('../../assets/images/image 34.png')} />
+                    <Image style={styles.imgM} source={require('../../assets/images/5.png')} />
                 </View>
                 <View >
-                    <Image style={styles.imgM} source={require('../../assets/images/big_image.png')} />
+                    <Image style={styles.imgM} source={require('../../assets/images/5.png')} />
                 </View>
                 <View>
-                    <Image style={styles.imgM} source={require('../../assets/images/image 1.png')} />
+                    <Image style={styles.imgM} source={require('../../assets/images/4.png')} />
                 </View>
                 <View >
-                    <Image style={styles.imgM} source={require('../../assets/images/image 2.png')} />
+                    <Image style={styles.imgM} source={require('../../assets/images/4.png')} />
                 </View>
+                <View>
+                    <Image style={styles.imgM} source={require('../../assets/images/5.png')}></Image>
+                </View>
+                
                 </ScrollView>
             </View>
 
@@ -99,8 +103,8 @@ const styles = StyleSheet.create({
       marginBottom: 20,
     },
     img: {
-      width: 80,
-      height: 80,
+      width: 55,
+      height: 55,
       borderRadius: 10,
     },
     descrContainer: {
@@ -122,7 +126,7 @@ const styles = StyleSheet.create({
       paddingHorizontal: 10,
     },
     imgM: {
-      width: 140, 
+      width: 160, 
       height: 150, 
       borderRadius: 10,
       marginHorizontal: 5,
@@ -135,8 +139,8 @@ const styles = StyleSheet.create({
        
     },
     imgB: {
-        height: 170,
-        width: 370,
+        height: 160,
+        width: 340,
         borderRadius: 15
     }
   });

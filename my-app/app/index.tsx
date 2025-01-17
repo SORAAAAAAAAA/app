@@ -9,31 +9,11 @@ import MainPage from './components/MainPage';
 import Search from './components/Search';
 import Orders from './components/Orders';
 import Profile from './components/Profile';
-import Cart from './components/Cart';
+import CustomHeader from './components/CustomHeader';
+import CustomHeaderCart from './components/CustomHeaderCart';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-
-const CustomHeader: React.FC<{ title: string; navigation: any }> = ({ title, navigation }) => {
-  return (
-    <View style={styles.headerContainer}>
-      <View style={styles.loc}>
-        <Icon name="location" size={25} color="#D42323" />
-      </View>
-      <View>
-        <Text style={styles.headerTitle}>DELIVER TO</Text>
-        <Text style={styles.headLoc}>Dasmarinas City, Cavite</Text>
-      </View>
-      <View style={styles.headIC}>
-        <Icon name="chevron-down-outline" size={25} color="#000000" style={styles.headerIcons} />
-        <Icon name="notifications-outline" size={25} color="#E95322" style={styles.headerIcons} />
-        <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
-          <Icon name="bag-outline" size={25} color="#E95322" style={styles.headerIcons} />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-};
 
 const App: React.FC = () => {
   const [isAppReady, setIsAppReady] = useState<boolean>(false);
@@ -53,70 +33,112 @@ const App: React.FC = () => {
 
   const MainTabs = () => (
     <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: {
-          borderTopWidth: 0,
-          elevation: 0,
-          shadowOpacity: 0,
-          height: 54,
-        },
-      }}
+      screenOptions={({ route }) => ({
+      tabBarIcon: ({ focused, color, size }) => {
+        let iconName: string = '';
+
+        if (route.name === 'Home') {
+        iconName = focused ? 'home' : 'home-outline';
+        } else if (route.name === 'Search') {
+        iconName = focused ? 'search' : 'search-outline';
+        } else if (route.name === 'Orders') {
+        iconName = focused ? 'list' : 'list-outline';
+        } else if (route.name === 'Profiles') {
+        iconName = focused ? 'person' : 'person-outline';
+        } 
+
+        return <Icon name={iconName} size={size} color={color} />;
+      },
+      tabBarActiveTintColor: '#E95322',
+      tabBarInactiveTintColor: 'gray',
+      tabBarStyle: {
+        borderTopWidth: 0,
+        elevation: 0,
+        shadowOpacity: 0,
+        height: 54,
+      },
+      })}
     >
       <Tab.Screen
-        name="Home"
-        component={MainPage}
-        options={{
-          tabBarIcon: ({ color, size }) => <Icon name="home" color={'#D42323'} size={size} />,
-        }}
+      name="Home"
+      component={MainPage}
+      options={({ navigation }) => ({
+        tabBarIcon: ({ color, size }) => <Icon name="home" color={color} size={size} />,
+        header: () => <CustomHeader title="Home" navigation={navigation} />,
+      })}
       />
       <Tab.Screen
-        name="Search"
-        component={Search}
-        options={{
-          tabBarIcon: ({ color, size }) => <Icon name="search-outline" color={color} size={size} />,
-        }}
+      name="Search"
+      component={Search}
+      options={({ navigation }) => ({
+        tabBarIcon: ({ color, size }) => <Icon name="search-outline" color={color} size={size} />,
+        header: () => <CustomHeader title="Search" navigation={navigation} />,
+      })}
       />
       <Tab.Screen
-        name="Orders"
-        component={Orders}
-        options={{
-          tabBarIcon: ({ color, size }) => <Icon name="document-text-outline" color={color} size={size} />,
-        }}
+      name="Orders"
+      component={Orders}
+      options={({ navigation }) => ({
+        tabBarIcon: ({ color, size }) => <Icon name="document-text-outline" color={color} size={size} />,
+        header: () => <CustomHeaderCart title="Orders" navigation={navigation} />,
+      })}
       />
       <Tab.Screen
-        name="Profiles"
-        component={Profile}
-        options={{
-          tabBarIcon: ({ color, size }) => <Icon name="person-outline" color={color} size={size} />,
-        }}
+      name="Profiles"
+      component={Profile}
+      options={{
+        tabBarIcon: ({ color, size }) => <Icon name="person-outline" color={color} size={size} />,
+        headerShown: false,
+      }}
       />
+     
     </Tab.Navigator>
   );
-
   return (
-
-      <SafeAreaView style={styles.safeArea}>
-        <Stack.Navigator>
-          {isLogged ? (
-            <Stack.Screen
-              name="Main"
-              component={MainTabs}
-              options={({ navigation }) => ({
-                header: () => <CustomHeader title="Main Page" navigation={navigation} />,
-              })}
-            />
-          ) : (
-            <Stack.Screen
-              name="Home"
-              options={{ headerShown: false }}
-            >
-              {props => <LogSign {...props} setIsLogged={setIsLogged} />}
-            </Stack.Screen>
-          )}
-          <Stack.Screen name="Cart" component={Cart} />
-        </Stack.Navigator>
-      </SafeAreaView>
+    <SafeAreaView style={styles.safeArea}>
+      <Stack.Navigator>
+        {isLogged ? (
+          <Stack.Screen
+            name="Main"
+            component={MainTabs}
+            options={{ headerShown: false }}
+          />
+        ) : (
+          <Stack.Screen
+            name="LogSign"
+            options={{ headerShown: false }}
+          >
+            {props => <LogSign {...props} setIsLogged={setIsLogged} />}
+          </Stack.Screen>
+        )}
+        <Stack.Screen
+          name="Order"
+          component={Orders}
+          options={({ navigation }) => ({
+            header: () => <CustomHeaderCart title="Home" navigation={navigation} />,
+          })}
+        />
+        <Stack.Screen
+          name="Profile"
+          component={Profile}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Home"
+          component={MainPage}
+          options={({ navigation }) => ({
+            header: () => <CustomHeader title="Home" navigation={navigation} />,
+          })}
+        />
+        <Stack.Screen
+          name="Search"
+          component={Search}
+          options={({ navigation }) => ({
+            header: () => <CustomHeader title="Search" navigation={navigation} />,
+          })}
+        />
+      </Stack.Navigator>
+    </SafeAreaView>
   );
 };
 
@@ -124,33 +146,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-  },
-  headerContainer: {
-    flexDirection: 'row',
-    height: 60,
-    backgroundColor: '#ffffff',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-  },
-  headerTitle: {
-    color: '#E95322',
-    fontSize: 20,
-    fontWeight: 'bold',
-    fontFamily: 'Poppins-SemiBold',
-  },
-  headLoc: {
-    fontFamily: 'Poppins-SemiBold',
-  },
-  headIC: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  headerIcons: {
-    marginHorizontal: 5,
-  },
-  loc: {
-    marginLeft: 10,
   },
 });
 

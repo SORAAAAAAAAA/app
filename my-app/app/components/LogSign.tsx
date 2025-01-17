@@ -18,7 +18,7 @@ interface LogSignProps {
   
     const handleRegister = async () => {
       try {
-        const response = await fetch('http://192.168.5.94:5000/register', {
+        const response = await fetch('http://192.168.254.125:5000/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ interface LogSignProps {
   
     const handleLogin = async () => {
       try {
-        const response = await fetch('http://192.168.5.94:5000/login', {
+        const response = await fetch('http://192.168.254.125:5000/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
